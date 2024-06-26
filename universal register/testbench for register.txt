@@ -1,0 +1,89 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity universal_register_tb is
+--  Port ( );
+end universal_register_tb;
+
+architecture Behavioral of universal_register_tb is   --declaring architecture for testbench
+component universal_in_out_register is
+ port (
+      SI_right : in STD_LOGIC; --shift right input
+      SI_left : in STD_LOGIC; -- shift left input
+      M : in STD_LOGIC_VECTOR (3 downto 0); --parallel input
+      CLK : in STD_LOGIC; --synchronus clock for the D flip flops
+      CLR : in STD_LOGIC; --Synchronus clear for the d flip flops
+      S : in STD_LOGIC_VECTOR (1 downto 0); --Select for 4 to 1 MUX 
+      F : out STD_LOGIC_VECTOR (3 downto 0) --parallel output
+ );
+ end component universal_in_out_register;
+ signal  SI_right_tb : STD_LOGIC;                --declaring the test variables
+ signal  SI_left_tb :  STD_LOGIC; 
+ signal  M_tb :  STD_LOGIC_VECTOR (3 downto 0); 
+ signal  CLK_tb :  STD_LOGIC; 
+ signal  CLR_tb :  STD_LOGIC; 
+ signal  S_tb :  STD_LOGIC_VECTOR (1 downto 0);  
+ signal  F_tb :  STD_LOGIC_VECTOR (3 downto 0);
+ 
+ constant TIME_DELTA: time := 10ns;
+
+begin
+DUT: universal_in_out_register    --instantiating the module
+port map (
+ SI_right => SI_right_tb,
+ SI_left => SI_left_tb,
+ M => M_tb,
+ CLK => CLK_tb,
+ CLR => CLR_tb,
+ S => S_tb,
+ F => F_tb
+);
+
+clock_process: process 
+begin 
+    CLK_tb <=  not CLK_tb;   --adding clock
+    wait for TIME_DELTA/2 ;
+ end process clock_process;   
+ 
+ simulation: process    --giving series of inputs
+ begin 
+  CLR_tb <= '1' after 3ns;
+  CLR_tb <= '0' after TIME_DELTA;
+   wait for TIME_DELTA;
+   
+   S_tb <= "00";
+   wait for TIME_DELTA;
+   
+   M_tb <= "1101";
+   wait for TIME_DELTA;
+   
+   S_tb <= "11";
+   wait for TIME_DELTA;
+   
+   SI_right_tb <= '1';
+   wait for TIME_DELTA;
+   
+   S_tb <= "01";
+   wait for 2*TIME_DELTA;
+   
+   SI_right_tb <= '0'; SI_left_tb <= '1';
+   wait for TIME_DELTA;
+   
+   S_tb <= "10";
+   wait for 2*TIME_DELTA;
+   
+   CLR_tb <= '1';
+   wait for TIME_DELTA;
+   
+   CLR_tb <= '0'; 
+   M_tb <= "1001";
+   wait for TIME_DELTA;
+   
+   S_tb <= "11";
+   wait for TIME_DELTA;
+ 
+ end process simulation;
+
+
+end Behavioral;

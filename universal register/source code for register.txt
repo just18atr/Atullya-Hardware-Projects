@@ -1,0 +1,35 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity universal_in_out_register is
+    Port ( SI_right : in STD_LOGIC; --shift right input
+           SI_left : in STD_LOGIC; -- shift left input
+           M : in STD_LOGIC_VECTOR (3 downto 0); --parallel input
+           CLK : in STD_LOGIC; --synchronus clock for the D flip flops
+           CLR : in STD_LOGIC; --Synchronus clear for the d flip flops
+           S : in STD_LOGIC_VECTOR (1 downto 0); --Select for 4 to 1 MUX 
+           F : out STD_LOGIC_VECTOR (3 downto 0) -- parallel output
+           );
+end universal_in_out_register;
+
+architecture Behavioral of universal_in_out_register is
+signal temp: STD_LOGIC_VECTOR (3 downto 0);      --internal 4-bit shift register
+begin
+ process (CLK, CLR)
+ begin
+ if(CLR = '1') then
+  temp <= "0000";-- clear function
+ else 
+ case S is
+ when "00" => temp <= temp; -- hold function
+ when "01" => temp(2 downto 0) <= temp(3 downto 1); temp(3) <= SI_right; -- shift right function
+ when "10" => temp( 3 downto 1) <= temp( 2 downto 0); temp(0) <= SI_left; --shift left function
+ when "11" => temp <= M; -- parallel input function
+ end case;
+ end if;
+ if rising_edge(CLK) then
+ F <= temp;     --at positive edge all the d flip flops will show the output as per the fucntions
+ end if;
+ end process;
+ 
+end Behavioral;
