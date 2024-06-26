@@ -1,0 +1,20 @@
+`timescale 1ns / 1ps
+
+module WT_multiplier_tb;
+   
+    reg [4:0] mud_tb, mul_tb;   //declaring test variables
+    wire [7:0] product_tb;
+  
+    WT_Multiplier DUT(.mud(mud_tb), .mul(mul_tb), .product(product_tb));   //instatiating  the module under test
+  
+   initial 
+      begin
+       $monitor( $time, "multiplicand = %4b, multiplier = %4b, product = %7b", mud_tb, mul_tb, product_tb);  //monitoring the changes
+       
+       #10 mul_tb = 4'b0; mud_tb = 4'd3;     //giving series of inputs
+       #200 mud_tb = 4'd10; mul_tb = 4'd7;
+       #200 mud_tb = 4'd13; mul_tb = 4'd9;
+       200 mud_tb = 4'd8; mul_tb = 4'd8;
+       #200 $finish;       
+      end
+endmodule

@@ -1,0 +1,63 @@
+`timescale 1ns / 1ps
+
+module half_adder(sum, carry, a , b);  //module for half adder
+    input a ,b;
+    output reg sum, carry;
+
+    always @(*)
+     begin
+       sum <= a^b;
+       carry <= a&b;
+     end
+endmodule     
+
+
+module full_adder(sum, carry, a ,b, c);  //module for full adder 
+    input a ,b, c;
+    output reg sum, carry;
+
+    always @(*)
+     begin
+       sum <= a^b^c;
+       carry <= ((a&b)+(b&c)+ (c&a)) ;
+     end
+endmodule     
+     
+module WT_Multiplier(
+    input [3:0] mud,    //declaring the inputs and output for the module
+    input [3:0] mul,
+    output reg [7:0] product
+    );
+    
+     wire [5:1] S, C;    //internal registers and wires
+     wire [6:2] Ss, Cc; 
+     wire [4:0] carry;
+  
+    always@(*)
+    begin
+     #10  half_adder(S[1], C[1], mud[1]&mul[0], mud[0]&mul[1]);                //first layer of sums and carries for the bitwise product of inputs
+     #10  half_adder(S[5], C[5], mud[3]&mul[2], mud[2]&mul[3]);
+     #10  full_adder(S[2], C[2], mud[2]&mul[0], mud[1]&mul[1], mud[0]&mul[2]);
+     #10  full_adder(S[3], C[3], mud[2]&mul[1], mud[0]&mul[3], mud[1]&mul[2]);
+     #10  full_adder(S[4], C[4], mud[3]&mul[1], mud[2]&mul[2], mud[1]&mul[3]);
+     
+     #10 half_adder(Ss[2], Cc[2], C[1], S[2]);                            //second layer of sum and carries from the previous layer's sum and carry
+     #10 half_adder(Ss[4], Cc[4], C[3], S[4]);
+     #10 half_adder(Ss[5], Cc[5], C[4], S[5]);
+     #10 half_adder(Ss[6], Cc[6], C[5], mud[3]&mul[3]);
+     
+     #10 product[0] <= mud[0]&mul[0];                               //final layer of sum and carries from previous layer's sum and carries
+     #10 product[1] <= S[1];
+     #10 product[2] <= Ss[2];
+     #10 half_adder(product[3], carry[0], Ss[3], Cc[2]);
+     #10 full_adder(product[4], carry[1], Ss[4], Cc[3], carry[0]);
+     #10 full_adder(product[5], carry[2], Ss[5], Cc[4], carry[1]);
+     #10 full_adder(product[6], carry[3], Ss[6], Cc[5], carry[2]); 
+     #10 half_adder(product[7], carry[4], Cc[6], carry[3]);
+     
+     
+     
+    end
+  
+  
+endmodule
