@@ -1,0 +1,26 @@
+`timescale 1ns / 1ps
+
+module GCD_tb();
+
+ reg [7:0] A, B;    //declaring test variables
+ wire[7:0] GCD;
+ reg clk; 
+ 
+  GCD_Finder HCF( .A(A), .B(B), .GCD(GCD), .clk(clk));      //instantiating the module under test
+ 
+ initial 
+   begin
+    clk = 1'b0;                                           //initializing clock 
+     $monitor( $time, " A = %8b, B = %8b, GCD = %8b", A , B , GCD);     //monitoring changes
+   end
+  always #10 clk = ~clk;                  //adding clock
+ 
+ initial 
+  begin                              //giving series of inputs across time
+   #8 A = 8'd120; B = 8'd40;
+   #100 A = 8'd23; B = 8'd41;
+   #100 A = 8'd79; B= 8'd79;
+   #100 $finish;
+  end
+ 
+endmodule

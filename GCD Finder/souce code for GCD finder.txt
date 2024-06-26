@@ -1,0 +1,67 @@
+`timescale 1ns / 1ps
+
+module GCD_Finder(
+    input [7:0] A,      //declaring the inputs and outputs in the module
+    input [7:0] B,
+  output reg [7:0] GCD,
+    input clk
+    );
+    
+  reg [7:0] tempA, tempB;            //internal registers
+  reg [1:0] state, nextstate;
+  
+  parameter s0 = 2'b0, s1 = 2'b01, s2 = 2'b10, s3 = 2'b11;
+    
+  always@(A, B)
+     begin 
+      tempA <= A;               //copying the inputs in the internal variables
+      tempB <= B;
+      state <= s0;            // initiating the state and GCD  
+      GCD <= 8'd1; 
+     end
+     
+  always@(posedge clk)
+       begin                             //defining the change of states during the process with corresponding inputs
+         case(state)
+           s0 : begin
+             if (tempA == tempB) nextstate <= s3;
+             else if (tempA > tempB) nextstate <= s1;
+             else if (tempB > tempA) nextstate <= s2;
+           end
+           
+           s1 : begin
+              nextstate <= s0;
+           end
+           
+           s2 : begin
+              nextstate <= s0;
+           end
+           
+           s3:  nextstate <= s3;
+      
+         endcase
+          #5 state <= nextstate;
+         
+      end
+  
+      always@(state)
+        begin
+          case(state)                //defining the functions to be done at every state
+            s0: begin
+             
+            end
+            
+            s1: begin
+             #1 tempA <= tempA - tempB;
+            end
+            
+            s2: begin
+             #1 tempB <= tempB - tempA;
+            end
+            
+            s3: #1 GCD <= tempA;
+            
+          endcase
+    
+         end
+endmodule
