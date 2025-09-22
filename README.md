@@ -57,6 +57,3 @@ This project implements a **4-floor Elevator Control System** using **Verilog HD
 * Extendable to multi-floor elevators with advanced scheduling.
 
 ---
-
-
-Do you want me to also include a **state transition diagram** (in text/ASCII or schematic style) so someone reading your repo immediately understands the floor logic?
